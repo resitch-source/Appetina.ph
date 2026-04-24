@@ -1490,76 +1490,92 @@ footer {
   </div>
 
   <div class="contact-form reveal">
-    <div class="form-title">Request a Quote</div>
-    <div class="form-sub">Fill out the form and we'll get back to you within 24 hours.</div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>First Name</label>
-        <input type="text" placeholder="Maria">
-      </div>
-      <div class="form-group">
-        <label>Last Name</label>
-        <input type="text" placeholder="Santos">
-      </div>
+
+    <!-- SUCCESS STATE -->
+    <div id="formSuccess" style="display:none; text-align:center; padding:3rem 1rem;">
+      <div style="font-size:3.5rem; margin-bottom:1rem;">🎉</div>
+      <div style="font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:600; color:var(--earth); margin-bottom:0.7rem;">Inquiry Received!</div>
+      <p style="font-size:0.9rem; color:var(--earth); opacity:0.65; line-height:1.8; margin-bottom:2rem;">Thank you for reaching out to Appetina. We'll get back to you at <strong id="successEmail"></strong> within 24 hours.</p>
+      <button class="btn-primary" onclick="resetForm()" style="border:none; cursor:pointer;">Send Another Inquiry</button>
     </div>
-    <div class="form-group">
-      <label>Email Address</label>
-      <input type="email" placeholder="maria@example.com">
-    </div>
-    <div class="form-group">
-      <label>Phone / Viber</label>
-      <input type="tel" placeholder="+63 9XX XXX XXXX">
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Event Type</label>
-        <select>
-          <option value="">Select type...</option>
-          <option>Wedding</option>
-          <option>Corporate Event</option>
-          <option>Birthday / Debut</option>
-          <option>Family Reunion</option>
-          <option>Fiesta / Community</option>
-          <option>Other</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>No. of Guests</label>
-        <input type="number" placeholder="100">
-      </div>
-    </div>
-    <div class="form-group">
-      <label>Preferred Package</label>
-      <div class="pkg-selector">
-        <div class="pkg-option" onclick="selectPkg(this,'kamayan')">
-          <div class="pkg-opt-name">🍽️ Kamayan</div>
-          <div class="pkg-opt-detail">Classic · ₱280/pax · min. 50 pax</div>
+
+    <!-- FORM BODY -->
+    <div id="formBody">
+      <div class="form-title">Request a Quote</div>
+      <div class="form-sub">Fill out the form and we'll get back to you within 24 hours.</div>
+
+      <div id="formError" style="display:none; background:#fdf0ed; border:1px solid var(--terracotta); border-radius:4px; padding:0.8rem 1rem; margin-bottom:1rem; font-size:0.82rem; color:var(--terracotta);"></div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name *</label>
+          <input type="text" id="firstName" name="First Name" placeholder="Maria" required>
         </div>
-        <div class="pkg-option" onclick="selectPkg(this,'pintakasi')">
-          <div class="pkg-opt-badge">Most Popular</div>
-          <div class="pkg-opt-name">🎉 Pintakasi</div>
-          <div class="pkg-opt-detail">Signature · ₱450/pax · min. 80 pax</div>
-        </div>
-        <div class="pkg-option" onclick="selectPkg(this,'handaan')">
-          <div class="pkg-opt-name">👑 Handaan</div>
-          <div class="pkg-opt-detail">Premium · ₱750/pax · min. 100 pax</div>
-        </div>
-        <div class="pkg-option" onclick="selectPkg(this,'custom')">
-          <div class="pkg-opt-name">✏️ Custom</div>
-          <div class="pkg-opt-detail">Tailored to your needs</div>
+        <div class="form-group">
+          <label>Last Name *</label>
+          <input type="text" id="lastName" name="Last Name" placeholder="Santos" required>
         </div>
       </div>
-      <input type="hidden" id="selectedPackage" value="">
+      <div class="form-group">
+        <label>Email Address *</label>
+        <input type="email" id="emailAddr" name="Email" placeholder="maria@example.com" required>
+      </div>
+      <div class="form-group">
+        <label>Phone / Viber *</label>
+        <input type="tel" id="phone" name="Phone" placeholder="+63 9XX XXX XXXX" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Event Type *</label>
+          <select id="eventType" name="Event Type" required>
+            <option value="">Select type...</option>
+            <option>Wedding</option>
+            <option>Corporate Event</option>
+            <option>Birthday / Debut</option>
+            <option>Family Reunion</option>
+            <option>Fiesta / Community</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>No. of Guests *</label>
+          <input type="number" id="guests" name="No. of Guests" placeholder="100" min="1" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Preferred Package</label>
+        <div class="pkg-selector">
+          <div class="pkg-option" onclick="selectPkg(this,'Kamayan — Classic ₱280/pax')">
+            <div class="pkg-opt-name">🍽️ Kamayan</div>
+            <div class="pkg-opt-detail">Classic · ₱280/pax · min. 50 pax</div>
+          </div>
+          <div class="pkg-option" onclick="selectPkg(this,'Pintakasi — Signature ₱450/pax')">
+            <div class="pkg-opt-badge">Most Popular</div>
+            <div class="pkg-opt-name">🎉 Pintakasi</div>
+            <div class="pkg-opt-detail">Signature · ₱450/pax · min. 80 pax</div>
+          </div>
+          <div class="pkg-option" onclick="selectPkg(this,'Handaan — Premium ₱750/pax')">
+            <div class="pkg-opt-name">👑 Handaan</div>
+            <div class="pkg-opt-detail">Premium · ₱750/pax · min. 100 pax</div>
+          </div>
+          <div class="pkg-option" onclick="selectPkg(this,'Custom Package')">
+            <div class="pkg-opt-name">✏️ Custom</div>
+            <div class="pkg-opt-detail">Tailored to your needs</div>
+          </div>
+        </div>
+        <input type="hidden" id="selectedPackage" name="Preferred Package" value="Not specified">
+      </div>
+      <div class="form-group">
+        <label>Event Date</label>
+        <input type="date" id="eventDate" name="Event Date">
+      </div>
+      <div class="form-group">
+        <label>Tell us about your event</label>
+        <textarea id="message" name="Message" placeholder="Share your vision, theme, special requests, or any dietary requirements..."></textarea>
+      </div>
+      <button class="form-submit" id="submitBtn" onclick="handleSubmit(event)">Send Inquiry →</button>
     </div>
-    <div class="form-group">
-      <label>Event Date</label>
-      <input type="date">
-    </div>
-    <div class="form-group">
-      <label>Tell us about your event</label>
-      <textarea placeholder="Share your vision, theme, special requests, or any dietary requirements..."></textarea>
-    </div>
-    <button class="form-submit" onclick="handleSubmit(this)">Send Inquiry →</button>
+
   </div>
 </section>
 
@@ -1668,14 +1684,88 @@ document.querySelectorAll('.pkg-btn').forEach(btn => {
   });
 });
 
-// Form submit
-function handleSubmit(btn) {
-  btn.textContent = '✓ Inquiry Sent!';
-  btn.style.background = 'var(--sage)';
-  setTimeout(() => {
+// Form submit via Formspree
+async function handleSubmit(e) {
+  e.preventDefault();
+
+  // Validation
+  const required = ['firstName','lastName','emailAddr','phone','eventType','guests'];
+  const labels = {'firstName':'First Name','lastName':'Last Name','emailAddr':'Email Address','phone':'Phone','eventType':'Event Type','guests':'No. of Guests'};
+  let missing = [];
+  required.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el.value.trim()) missing.push(labels[id]);
+  });
+
+  const errBox = document.getElementById('formError');
+  if (missing.length) {
+    errBox.style.display = 'block';
+    errBox.textContent = '⚠ Please fill in: ' + missing.join(', ');
+    return;
+  }
+  errBox.style.display = 'none';
+
+  const btn = document.getElementById('submitBtn');
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+  btn.style.opacity = '0.7';
+
+  // Build form data
+  const data = {
+    'First Name': document.getElementById('firstName').value.trim(),
+    'Last Name': document.getElementById('lastName').value.trim(),
+    'Email': document.getElementById('emailAddr').value.trim(),
+    'Phone': document.getElementById('phone').value.trim(),
+    'Event Type': document.getElementById('eventType').value,
+    'No. of Guests': document.getElementById('guests').value,
+    'Preferred Package': document.getElementById('selectedPackage').value || 'Not specified',
+    'Event Date': document.getElementById('eventDate').value || 'Not specified',
+    'Message': document.getElementById('message').value.trim() || 'No additional message.'
+  };
+
+  try {
+    // ⚠️ IMPORTANT: Replace YOUR_FORM_ID below with your actual Formspree form ID
+    // Steps: 1) Go to https://formspree.io  2) Sign up free  3) Create new form
+    // 4) Copy the form ID (e.g. xpzgkwqr)  5) Replace YOUR_FORM_ID below
+    const FORMSPREE_ID = 'xwvaywye';
+    const endpoint = `https://formspree.io/f/${FORMSPREE_ID}`;
+
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+      document.getElementById('formBody').style.display = 'none';
+      document.getElementById('successEmail').textContent = data['Email'];
+      document.getElementById('formSuccess').style.display = 'block';
+    } else {
+      const json = await res.json();
+      errBox.style.display = 'block';
+      errBox.textContent = '⚠ Submission failed: ' + (json.error || 'Please try again or contact us directly.');
+      btn.textContent = 'Send Inquiry →';
+      btn.disabled = false;
+      btn.style.opacity = '1';
+    }
+  } catch (err) {
+    errBox.style.display = 'block';
+    errBox.textContent = '⚠ Network error. Please email us directly at resitch@gmail.com';
     btn.textContent = 'Send Inquiry →';
-    btn.style.background = '';
-  }, 3000);
+    btn.disabled = false;
+    btn.style.opacity = '1';
+  }
+}
+
+function resetForm() {
+  document.getElementById('formSuccess').style.display = 'none';
+  document.getElementById('formBody').style.display = 'block';
+  document.getElementById('formBody').querySelectorAll('input,select,textarea').forEach(el => el.value = '');
+  document.querySelectorAll('.pkg-option').forEach(o => o.classList.remove('selected'));
+  document.getElementById('selectedPackage').value = 'Not specified';
+  document.getElementById('submitBtn').textContent = 'Send Inquiry →';
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('submitBtn').style.opacity = '1';
 }
 </script>
 </body>
