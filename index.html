@@ -1727,7 +1727,7 @@ async function handleSubmit(e) {
     // ⚠️ IMPORTANT: Replace YOUR_FORM_ID below with your actual Formspree form ID
     // Steps: 1) Go to https://formspree.io  2) Sign up free  3) Create new form
     // 4) Copy the form ID (e.g. xpzgkwqr)  5) Replace YOUR_FORM_ID below
-    const FORMSPREE_ID = 'xwvaywye';
+    const FORMSPREE_ID = 'YOUR_FORM_ID';
     const endpoint = `https://formspree.io/f/${FORMSPREE_ID}`;
 
     const res = await fetch(endpoint, {
@@ -1766,6 +1766,418 @@ function resetForm() {
   document.getElementById('submitBtn').textContent = 'Send Inquiry →';
   document.getElementById('submitBtn').disabled = false;
   document.getElementById('submitBtn').style.opacity = '1';
+}
+</script>
+
+<!-- ══════════════════════════════════════════
+     APPETINA AI CHATBOT
+══════════════════════════════════════════ -->
+<style>
+/* ── Fab Button ── */
+#chatFab {
+  position: fixed;
+  bottom: 2rem; right: 2rem;
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  background: var(--terracotta);
+  color: white;
+  border: none; cursor: pointer;
+  box-shadow: 0 6px 24px rgba(196,98,45,0.45);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem;
+  z-index: 999;
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+#chatFab:hover { transform: scale(1.1); background: var(--earth); }
+#chatFab .fab-badge {
+  position: absolute; top: -4px; right: -4px;
+  background: var(--gold); color: white;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  font-size: 0.65rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid white;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+/* ── Chat Window ── */
+#chatWindow {
+  position: fixed;
+  bottom: 6.5rem; right: 2rem;
+  width: 370px; max-height: 560px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(59,42,26,0.18);
+  display: flex; flex-direction: column;
+  z-index: 998;
+  overflow: hidden;
+  opacity: 0; pointer-events: none;
+  transform: translateY(20px) scale(0.97);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+#chatWindow.open {
+  opacity: 1; pointer-events: all;
+  transform: translateY(0) scale(1);
+}
+
+/* ── Header ── */
+.chat-header {
+  background: var(--earth);
+  padding: 1rem 1.2rem;
+  display: flex; align-items: center; gap: 0.8rem;
+  flex-shrink: 0;
+}
+.chat-avatar {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--terracotta);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.chat-header-info { flex: 1; }
+.chat-header-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem; font-weight: 600;
+  color: var(--cream); line-height: 1;
+}
+.chat-header-status {
+  font-size: 0.68rem; color: var(--cream);
+  opacity: 0.6; margin-top: 0.2rem;
+  display: flex; align-items: center; gap: 0.3rem;
+}
+.chat-header-status::before {
+  content: '';
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #5cb85c; display: inline-block;
+}
+.chat-close {
+  background: none; border: none; cursor: pointer;
+  color: var(--cream); opacity: 0.6; font-size: 1.2rem;
+  transition: opacity 0.2s;
+}
+.chat-close:hover { opacity: 1; }
+
+/* ── Messages ── */
+.chat-messages {
+  flex: 1; overflow-y: auto;
+  padding: 1rem;
+  display: flex; flex-direction: column; gap: 0.8rem;
+  background: var(--warm-white);
+}
+.chat-messages::-webkit-scrollbar { width: 4px; }
+.chat-messages::-webkit-scrollbar-track { background: transparent; }
+.chat-messages::-webkit-scrollbar-thumb { background: rgba(59,42,26,0.15); border-radius: 4px; }
+
+.msg {
+  display: flex; gap: 0.5rem; align-items: flex-end;
+  max-width: 88%;
+}
+.msg.bot { align-self: flex-start; }
+.msg.user { align-self: flex-end; flex-direction: row-reverse; }
+
+.msg-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--terracotta);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; flex-shrink: 0;
+  margin-bottom: 2px;
+}
+
+.msg-bubble {
+  padding: 0.65rem 0.9rem;
+  border-radius: 14px;
+  font-size: 0.85rem; line-height: 1.55;
+  max-width: calc(100% - 38px);
+}
+.msg.bot .msg-bubble {
+  background: white;
+  color: var(--earth);
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 1px 4px rgba(59,42,26,0.08);
+}
+.msg.user .msg-bubble {
+  background: var(--terracotta);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+/* ── Typing indicator ── */
+.typing-dots {
+  display: flex; gap: 4px; padding: 0.65rem 0.9rem;
+  background: white; border-radius: 14px;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 1px 4px rgba(59,42,26,0.08);
+  width: fit-content;
+}
+.typing-dots span {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--terracotta); opacity: 0.4;
+  animation: typingBounce 1.2s ease infinite;
+}
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingBounce {
+  0%,60%,100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+
+/* ── Quick Replies ── */
+.quick-replies {
+  display: flex; flex-wrap: wrap; gap: 0.4rem;
+  padding: 0.5rem 1rem 0;
+}
+.qr-btn {
+  padding: 0.35rem 0.75rem;
+  border: 1px solid rgba(196,98,45,0.35);
+  border-radius: 100px;
+  font-size: 0.72rem; font-weight: 500;
+  color: var(--terracotta);
+  background: white; cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.qr-btn:hover { background: var(--terracotta); color: white; border-color: var(--terracotta); }
+
+/* ── Input ── */
+.chat-input-area {
+  padding: 0.75rem 1rem;
+  border-top: 1px solid rgba(59,42,26,0.08);
+  display: flex; gap: 0.5rem; align-items: flex-end;
+  background: white; flex-shrink: 0;
+}
+#chatInput {
+  flex: 1; border: 1px solid rgba(59,42,26,0.15);
+  border-radius: 20px; padding: 0.55rem 1rem;
+  font-family: 'Jost', sans-serif; font-size: 0.85rem;
+  color: var(--earth); background: var(--cream);
+  outline: none; resize: none; max-height: 100px;
+  transition: border-color 0.2s;
+  line-height: 1.4;
+}
+#chatInput:focus { border-color: var(--terracotta); }
+#chatSend {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--terracotta); color: white;
+  border: none; cursor: pointer; font-size: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s, transform 0.2s;
+  flex-shrink: 0;
+}
+#chatSend:hover { background: var(--earth); transform: scale(1.05); }
+#chatSend:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+@media (max-width: 480px) {
+  #chatWindow { width: calc(100vw - 2rem); right: 1rem; bottom: 5.5rem; }
+  #chatFab { right: 1rem; bottom: 1rem; }
+}
+</style>
+
+<!-- FAB -->
+<button id="chatFab" onclick="toggleChat()" title="Chat with Nena">
+  🍽️
+  <span class="fab-badge">1</span>
+</button>
+
+<!-- CHAT WINDOW -->
+<div id="chatWindow">
+  <div class="chat-header">
+    <div class="chat-avatar">🍽️</div>
+    <div class="chat-header-info">
+      <div class="chat-header-name">Nena — Appetina Assistant</div>
+      <div class="chat-header-status">Online now</div>
+    </div>
+    <button class="chat-close" onclick="toggleChat()">✕</button>
+  </div>
+
+  <div class="chat-messages" id="chatMessages"></div>
+
+  <div class="quick-replies" id="quickReplies"></div>
+
+  <div class="chat-input-area">
+    <textarea id="chatInput" placeholder="Ask about our menu, packages..." rows="1"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"
+      oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+    <button id="chatSend" onclick="sendMessage()" title="Send">➤</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// APPETINA AI CHATBOT
+// ══════════════════════════════════════════
+const SYSTEM_PROMPT = `You are Nena, the friendly and knowledgeable AI assistant for Appetina — a premium Modern Filipino Cuisine catering and food services company based in Iligan City, Philippines.
+
+Your personality: warm, enthusiastic about Filipino food, professional, concise. You speak in a friendly, conversational tone. You occasionally use Filipino food terms naturally.
+
+BUSINESS INFORMATION:
+- Company: Appetina Food & Catering Services
+- Location: Iligan City, Lanao del Norte, Philippines
+- Phone/Viber: +63 905 251 5051
+- Email: resitch@gmail.com
+- Hours: Monday–Saturday, 8:00 AM – 6:00 PM
+- Specialty: Modern Filipino Cuisine — traditional dishes elevated with contemporary technique
+
+SERVICES:
+1. Wedding Catering — from ₱450/pax
+2. Corporate Events — from ₱280/pax
+3. Private Celebrations (birthdays, debuts, anniversaries) — from ₱350/pax
+4. Packed Meals & Bento — from ₱120/pack
+5. Livelihood & Fiesta events — custom pricing
+6. Food Delivery — available daily
+
+CATERING PACKAGES:
+1. Kamayan (Classic) — ₱280/pax, min. 50 pax
+   • 5-course set menu, rice & soup, basic table setup, service staff (1:25 ratio), 3 dessert selections
+
+2. Pintakasi (Signature) — ₱450/pax, min. 80 pax — MOST POPULAR
+   • 8-course curated menu, live cooking stations, premium table décor, dedicated event coordinator, full bar setup, 5 dessert selections
+
+3. Handaan (Premium) — ₱750/pax, min. 100 pax
+   • 12-course tasting menu, multi-station buffet, luxury linen & floral decor, personal chef consultation, premium open bar, wedding cake coordination
+
+SIGNATURE DISHES:
+- Lechon Belly Roulade (slow-roasted pork belly with liver sauce)
+- Kare-Kare Modernista (braised oxtail in peanut sauce with bagoong butter)
+- Crispy Sisig Cups (pork sisig in golden wonton cups)
+- Inihaw na Tanigue (grilled Spanish mackerel with calamansi beurre blanc)
+- Ensaladang Pako (fern salad with fermented shrimp vinaigrette)
+- Leche Flan Brûlée
+- Halo-Halo Royale
+- Calamansi Soda
+
+BOOKING PROCESS:
+Clients can request a quote by:
+1. Filling the Request a Quote form on the website (scroll down to Contact section)
+2. Calling/Viber: +63 905 251 5051
+3. Email: resitch@gmail.com
+
+GUIDELINES:
+- Keep responses SHORT — 2-4 sentences max unless more detail is specifically needed
+- For booking/pricing inquiries, encourage them to fill the contact form or call directly
+- If asked something you don't know, say you'll connect them with the team
+- Never make up prices or details not listed above
+- Always be warm and enthusiastic — food is joy!`;
+
+let chatHistory = [];
+let chatOpen = false;
+let botTyping = false;
+
+function toggleChat() {
+  chatOpen = !chatOpen;
+  const win = document.getElementById('chatWindow');
+  const fab = document.getElementById('chatFab');
+  win.classList.toggle('open', chatOpen);
+  fab.querySelector('.fab-badge').style.display = 'none';
+
+  if (chatOpen && chatHistory.length === 0) {
+    setTimeout(() => addBotMessage(
+      "Kumusta! 👋 I'm Nena, Appetina's AI assistant. I can help you with our menu, packages, pricing, and booking. What can I help you with today?",
+      ["Our packages 🍽️", "Pricing info 💰", "Book an event 📅", "View menu 👨‍🍳"]
+    ), 400);
+  }
+}
+
+function addBotMessage(text, quickReplies = []) {
+  const container = document.getElementById('chatMessages');
+
+  // Remove typing indicator if present
+  const typing = document.getElementById('typingIndicator');
+  if (typing) typing.remove();
+
+  const msg = document.createElement('div');
+  msg.className = 'msg bot';
+  msg.innerHTML = `
+    <div class="msg-avatar">🍽️</div>
+    <div class="msg-bubble">${text.replace(/\n/g,'<br>')}</div>`;
+  container.appendChild(msg);
+
+  // Quick replies
+  const qrArea = document.getElementById('quickReplies');
+  qrArea.innerHTML = '';
+  if (quickReplies.length) {
+    quickReplies.forEach(r => {
+      const btn = document.createElement('button');
+      btn.className = 'qr-btn';
+      btn.textContent = r;
+      btn.onclick = () => { qrArea.innerHTML=''; sendMessage(r); };
+      qrArea.appendChild(btn);
+    });
+  }
+
+  container.scrollTop = container.scrollHeight;
+  botTyping = false;
+  document.getElementById('chatSend').disabled = false;
+}
+
+function addUserMessage(text) {
+  const container = document.getElementById('chatMessages');
+  document.getElementById('quickReplies').innerHTML = '';
+  const msg = document.createElement('div');
+  msg.className = 'msg user';
+  msg.innerHTML = `<div class="msg-bubble">${text}</div>`;
+  container.appendChild(msg);
+  container.scrollTop = container.scrollHeight;
+}
+
+function showTyping() {
+  const container = document.getElementById('chatMessages');
+  const el = document.createElement('div');
+  el.className = 'msg bot'; el.id = 'typingIndicator';
+  el.innerHTML = `<div class="msg-avatar">🍽️</div>
+    <div class="typing-dots"><span></span><span></span><span></span></div>`;
+  container.appendChild(el);
+  container.scrollTop = container.scrollHeight;
+}
+
+async function sendMessage(overrideText) {
+  if (botTyping) return;
+  const input = document.getElementById('chatInput');
+  const text = (overrideText || input.value).trim();
+  if (!text) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  addUserMessage(text);
+  chatHistory.push({ role: 'user', content: text });
+
+  botTyping = true;
+  document.getElementById('chatSend').disabled = true;
+  showTyping();
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 400,
+        system: SYSTEM_PROMPT,
+        messages: chatHistory
+      })
+    });
+
+    const data = await res.json();
+    const reply = data?.content?.[0]?.text || "Sorry, I'm having a moment! Please call us at +63 905 251 5051 or email resitch@gmail.com.";
+    chatHistory.push({ role: 'assistant', content: reply });
+
+    // Pick contextual quick replies based on reply content
+    let qr = [];
+    const lower = reply.toLowerCase();
+    if (lower.includes('package') || lower.includes('₱')) qr = ['Tell me more 💬', 'Book now 📅', 'Other services'];
+    else if (lower.includes('contact') || lower.includes('form') || lower.includes('call')) qr = ['What packages do you have?', 'View the menu 🍽️'];
+    else if (lower.includes('menu') || lower.includes('dish')) qr = ['Pricing info 💰', 'Book an event 📅'];
+    else qr = ['Packages 🍽️', 'Pricing 💰', 'Book now 📅'];
+
+    addBotMessage(reply, qr);
+
+  } catch (err) {
+    addBotMessage("I'm having trouble connecting right now. Please reach us directly at +63 905 251 5051 or resitch@gmail.com — we'd love to help! 😊");
+  }
 }
 </script>
 </body>
